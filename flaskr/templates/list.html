@@ -1,0 +1,113 @@
+{% extends "base_template.html" %}
+{% block head %}
+<style type="text/css">
+    .tablecontainer {
+        background-color: #CCCCCC;
+        border-style: groove;
+    }
+    .tablehead {
+        border-width: 1px;
+        border-style: solid;
+        background-color: #DDDDFF
+    }
+    .tabdate       {
+        grid-column-start: 1; grid-column-end: 2;
+        background-color: #EEEEFF; font-weight: bold; padding: 5px;
+        border-style: solid; border-width: 1px;
+    }
+    .tabauthorname {
+        grid-column-start: 2; grid-column-end: 3;
+        background-color: #EEEEFF; font-weight: bold; padding: 5px;
+        border-style: solid; border-width: 1px;
+    }
+    .tabdownvotes  {
+        grid-column-start: 3; grid-column-end: 4;
+        background-color: #EEEEFF; font-size: 8pt; padding: 5px;
+        border-style: solid; border-width: 1px;
+    }
+    .tabreports    {
+        grid-column-start: 4; grid-column-end: 5;
+        background-color: #EEEEFF; font-size: 8pt; padding: 5px;
+        border-style: solid; border-width: 1px;
+    }
+    .tabmessage    { grid-column-start: 1; grid-column-end: 5; background-color: #FFFFFF; padding: 5px; }
+    .tabthread     {
+            grid-column-start: 1; grid-column-end: 5; background-color: #F0F0CF; font-weight: bold; padding: 5px;
+            /*margin: 0px 0px 15px 0px;*/
+    }
+    .tablecontent {
+        display:grid;
+        /* grid: "a b", "c c", "d d"; */
+        font-size: 10pt;
+        font-family: arial;
+        grid-template-columns: 200px 1fr;
+        grid-gap: 0px;
+        padding: 8px;
+        background-color: #AACCFF;
+        border-style: solid;
+        border-width: 2px;
+        margin: 8px;
+    }
+    .tablefoot {
+    }
+
+    .inputcontainer {
+        display: grid;
+        background-color: #DDDDDD;
+        padding: 5px;
+        border-style: solid;
+        margin: 5px;
+    }
+</style>
+<title>First flask app - title</title>
+{% endblock %}
+
+{% block body %}
+<div class="inputcontainer">
+    <form accept-charset="UTF-8" action="{{ url_for('listing_route') }}" method="post">
+        <label for="input_name">Author name:</label>
+        <input id="input_name" type="text" name="uname" />
+        <label for="input_name">minimum downvotes:</label>
+        <input id="input_down" type="number" size="3" name="mindownvotes" />
+        <label for="input_reps">minimum reports:</label>
+        <input id="input_reps" type="number" size="3" name="minreports" />
+        <input class=submit" type="submit" value="Submit">
+    </form>
+</div>
+<div class="tablecontainer">
+    <div class="tablehead">
+        --- table header ---
+    </div>
+    <div class="xtablecontent">
+        {% for post in resultset %}
+            <div class="tablecontent">
+                <div class="tabdate">{{post["createdAt"]}}</div>
+                <div class="tabauthorname">
+                    <a href="{{post['author']['profileUrl']}}">{{post["author"]["name"]}}</a> -&gt;
+                        {% if post["parentData"]|length>0 %}
+                            {{post["parentData"][0]["author"]["name"]}}
+                        {% else %}
+                            ******
+                        {% endif %}
+                </div>
+                <div class="tabdownvotes">{{post["dislikes"]}}</div>
+                <div class="tabreports">{{post["numReports"]}}</div>
+                <div class="tabmessage">{{post["message"]|safe}}</div>
+                <div class="tabthread">
+                    {% if post["threadData"]|length>0 %}
+                        link a kommenthez:
+                        <a href="https://disqus.com/home/discussion/hvg/{{post['threadData'][0]['slug']}}#comment-{{post['id']}}">
+                            {{post['threadData'][0]['clean_title']}}
+                        </a>
+                    {% else %}
+                    Hiányzik a thread adat
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="tablefoot">
+        --- the end of table ---
+    </div>
+</div>
+{% endblock %}
